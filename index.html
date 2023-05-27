@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Página móvil</title>
+  <style>
+    body {
+      text-align: center;
+      padding-top: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Página móvil</h1>
+  <button id="reproducir-en-tv">Dar clic para reproducir en la TV</button>
+
+  <script>
+    // Verificar si el navegador es compatible con Cast API
+    if (chrome.cast && chrome.cast.isAvailable) {
+      inicializar();
+    } else {
+      // Agrega la referencia a la librería Cast API
+      var script = document.createElement('script');
+      script.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js';
+      script.onload = function() {
+        inicializar();
+      };
+      document.body.appendChild(script);
+    }
+
+    function inicializar() {
+      // Agregar un manejador de eventos al botón
+      var button = document.getElementById('reproducir-en-tv');
+      button.addEventListener('click', reproducirEnTV);
+    }
+
+    function reproducirEnTV() {
+      // Obtener el elemento de video en tu página
+      var video = document.getElementById('mi-video');
+
+      // Obtener los dispositivos Chromecast disponibles
+      chrome.cast.requestSession(function(session) {
+        // Cargar el video en la sesión activa del Chromecast
+        var mediaInfo = new chrome.cast.media.MediaInfo("https://ia902607.us.archive.org/11/items/el-proyecto-adam_202303/El%20Proyecto%20Adam.m4v", 'video/mp4');
+        var request = new chrome.cast.media.LoadRequest(mediaInfo);
+        session.loadMedia(request);
+      }, function(error) {
+        console.log('Error al conectar con Chromecast: ' + error);
+      });
+    }
+  </script>
+</body>
+</html>
